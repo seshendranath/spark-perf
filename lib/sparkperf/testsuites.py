@@ -191,6 +191,25 @@ class StreamingTests(JVMPerfTestSuite):
         return str(result_string)
 
 
+class StreamingMemoryLeakTests(StreamingTests):
+
+    @classmethod
+    def process_output(cls, config, short_name, opt_list, stdout_filename, stderr_filename):
+        with open(stdout_filename, "r") as stdout_file:
+            output = stdout_file.read()
+        results_token = "No memory leak detected"
+        if results_token not in output:
+            result = "FAILED"
+            start = output.find("Detect memory leak")
+            if start >= 0:
+                result += "\n" + output[start:]
+            else:
+                result += "\nCannot find the memory leak report"
+        else:
+            result = results_token
+        return result
+
+
 class MLlibTestHelper(object):
 
     @classmethod
